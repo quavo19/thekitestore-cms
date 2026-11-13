@@ -1,8 +1,8 @@
 module.exports = {
   apps: [
     {
-      name: "deyarrah-cms",
-      cwd: "/home/terminal_ideas/deyarrah-cms",
+      name: "thekitestorecms",
+      cwd: "/home/terminal_ideas/thekitestorecms",
       script: "./node_modules/.bin/vite",
       args: "preview --port 3002 --host 0.0.0.0",
       interpreter: "/home/terminal_ideas/.nvm/versions/node/v20.19.5/bin/node",
@@ -12,8 +12,8 @@ module.exports = {
       env: {
         NODE_ENV: "production",
       },
-      error_file: "/home/terminal_ideas/.pm2/logs/deyarrah-cms-error.log",
-      out_file: "/home/terminal_ideas/.pm2/logs/deyarrah-cms-out.log",
+      error_file: "/home/terminal_ideas/.pm2/logs/thekitestorecms-error.log",
+      out_file: "/home/terminal_ideas/.pm2/logs/thekitestorecms-out.log",
       merge_logs: true,
       time: true,
     },

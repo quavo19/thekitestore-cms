@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useAuthContext } from "@/hooks/useAuthContext"
-import { 
-  Menu, 
+import {
+  Menu,
   LogOut,
   ChevronRight
 } from "lucide-react"
@@ -34,7 +34,7 @@ const SidebarContent = ({ onNavigate, className }) => {
     }
   }, [])
 
-  const filteredRoutes = useMemo(() => 
+  const filteredRoutes = useMemo(() =>
     routes.filter(route => hasRoleAccess(route.roles, userRole)),
     [userRole]
   )
@@ -52,14 +52,14 @@ const SidebarContent = ({ onNavigate, className }) => {
     <div className={cn("flex flex-col h-full bg-primary", className)}>
       <div className="px-4 pt-6">
         <div className="flex items-center gap-2">
-          <Image 
-            src={logoImage} 
-            alt="Deyarrah CMS Logo" 
+          <Image
+            src={logoImage}
+            alt="The Kite Store CMS Logo"
             className="h-10 w-auto bg-transparent"
           />
           <div className="flex flex-col">
             <h2 className="text-lg font-semibold text-white tracking-tight">
-              Deyarrah CMS
+              The Kite Store CMS
             </h2>
             <p className="text-xs text-white/60 font-medium">{formatRoleName(user?.role?.name)}</p>
           </div>
@@ -69,7 +69,7 @@ const SidebarContent = ({ onNavigate, className }) => {
         {filteredRoutes.map((route) => {
           const Icon = route.icon
           // Check if route is active: exact match or pathname starts with route path + '/'
-          const isActive = location.pathname === route.path || 
+          const isActive = location.pathname === route.path ||
                           (route.path !== '/' && location.pathname.startsWith(route.path + '/'))
 
           return (
@@ -84,15 +84,15 @@ const SidebarContent = ({ onNavigate, className }) => {
                   : "text-white/80 hover:bg-white/10 hover:text-white"
               )}
             >
-              <Icon 
+              <Icon
                 strokeWidth={1.5}
                 className={cn(
                   "h-5 w-5 shrink-0 transition-colors",
                   isActive ? "text-white" : "text-white/70 group-hover:text-white"
-                )} 
+                )}
               />
               <span className="flex-1">{route.title}</span>
-              
+
               {isActive && (
                 <ChevronRight className="h-4 w-4 opacity-70" />
               )}
