@@ -127,8 +127,24 @@ const ProductInfoStep = ({ formData, errors, onChange }) => {
           />
         </div>
 
+        <div className="md:col-span-2 rounded-xl border border-gray-200 p-4">
+          <label className="flex items-center gap-3 text-sm font-semibold text-gray-900">
+            <input type="checkbox" checked={Boolean(formData.hot_deal)} onChange={(event) => {
+              onChange({ target: { name: 'hot_deal', value: event.target.checked } })
+              if (event.target.checked) onChange({ target: { name: 'bookable_type', value: 'unit' } })
+            }} />
+            Hot Deal: one pre-owned device
+          </label>
+          <p className="mt-2 text-xs text-gray-600">A Hot Deal is one individual used device. Set the total stock to one and describe its condition and faults.</p>
+          {formData.hot_deal && <div className="mt-4 space-y-4">
+            <Textarea label="Condition and known faults" name="condition_notes" value={formData.condition_notes || ''} onChange={onChange} error={errors.condition_notes} required rows={3} placeholder="e.g. Light scratches on the back; battery health 85%." />
+            <Input label="Comparison price (GHS, optional)" name="compare_at_price" type="number" min="0.01" step="0.01" value={formData.compare_at_price || ''} onChange={onChange} error={errors.compare_at_price} placeholder="Only if a valid comparison price is available" />
+          </div>}
+        </div>
+
         <div>
           <Select
+            disabled={Boolean(formData.hot_deal)}
             label="Product Type"
             name="bookable_type"
             value={formData.bookable_type || ''}

@@ -30,6 +30,9 @@ const ProductDetail = () => {
   const [editFormData, setEditFormData] = useState({
     name: '',
     description: '',
+    hot_deal: false,
+    condition_notes: '',
+    compare_at_price: '',
     active: true,
     category_id: '',
     category_ids: [],
@@ -162,6 +165,9 @@ const ProductDetail = () => {
     setEditFormData({
       name: attrs.name || '',
       description: attrs.description || '',
+      hot_deal: Boolean(attrs.hot_deal),
+      condition_notes: attrs.condition_notes || '',
+      compare_at_price: attrs.compare_at_price ?? '',
       active: attrs.active !== false,
       category_id: attrs.category_id || attrs.category?.id || '',
       category_ids: attrs.category_ids || attrs.categories?.map((category) => category.id) || [],
@@ -183,6 +189,9 @@ const ProductDetail = () => {
     setEditFormData({
       name: attrs.name || '',
       description: attrs.description || '',
+      hot_deal: Boolean(attrs.hot_deal),
+      condition_notes: attrs.condition_notes || '',
+      compare_at_price: attrs.compare_at_price ?? '',
       active: attrs.active !== false,
       category_id: attrs.category_id || attrs.category?.id || '',
       category_ids: attrs.category_ids || attrs.categories?.map((category) => category.id) || [],
@@ -204,9 +213,17 @@ const ProductDetail = () => {
       return
     }
 
+    if (editFormData.hot_deal && !editFormData.condition_notes.trim()) {
+      toast.error('Validation Error', 'Describe the condition and known faults')
+      return
+    }
+
     updateProductMutation.mutate({
       name: editFormData.name,
       description: editFormData.description || '',
+      hot_deal: Boolean(editFormData.hot_deal),
+      condition_notes: editFormData.hot_deal ? editFormData.condition_notes : null,
+      compare_at_price: editFormData.compare_at_price || null,
       active: editFormData.active,
       category_id: editFormData.category_ids?.[0] || editFormData.category_id || null,
       category_ids: editFormData.category_ids || [],
@@ -393,6 +410,14 @@ const ProductDetail = () => {
                       rows={2}
                       textareaClassName=" py-[5px]! text-sm rounded-lg!"
                     />
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-800">
+                      <input type="checkbox" disabled={attrs.bookable_type !== 'unit'} checked={Boolean(editFormData.hot_deal)} onChange={(event) => setEditFormData(prev => ({ ...prev, hot_deal: event.target.checked }))} /> Hot Deal (one used device)
+                    </label>
+                    {attrs.bookable_type !== 'unit' && <p className="text-xs text-gray-500">Hot Deals require a unit product.</p>}
+                    {editFormData.hot_deal && <>
+                      <Textarea label="Condition and known faults" name="condition_notes" value={editFormData.condition_notes} onChange={handleEditFormChange} rows={3} required />
+                      <Input label="Comparison price (GHS, optional)" name="compare_at_price" type="number" min="0.01" step="0.01" value={editFormData.compare_at_price} onChange={handleEditFormChange} />
+                    </>}
                     <MultiChoice
                       label="Categories"
                       options={categoryOptions}
@@ -503,6 +528,8 @@ const ProductDetail = () => {
               </div>
             ) : (
               <dl className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {attrs.hot_deal && <div className="md:col-span-3 rounded-xl bg-gray-50 p-4"><dt className="text-sm font-semibold text-gray-900">Hot Deal · Condition and known faults</dt><dd className="mt-2 whitespace-pre-line text-sm text-gray-700">{attrs.condition_notes}</dd>{attrs.compare_at_price && <dd className="mt-2 text-xs text-gray-500">Comparison price: GHS {Number(attrs.compare_at_price).toFixed(2)}</dd>}</div>}
+                {attrs.demo && <div className="md:col-span-3 rounded-xl bg-gray-50 p-4 text-sm font-medium text-gray-700">Sample listing — no stock and not for sale</div>}
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-gray-50 rounded-lg mt-0.5">
                     <Tag className="w-4 h-4 text-gray-600" />

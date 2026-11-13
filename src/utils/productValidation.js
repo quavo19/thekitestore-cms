@@ -25,6 +25,10 @@ export const validateProductInfo = (data) => {
     errors.bookable_type = 'Product type must be either "bulk" or "unit"'
   }
 
+  if (data.hot_deal && data.bookable_type !== 'unit') errors.bookable_type = 'Hot Deals must use the unit product type'
+  if (data.hot_deal && !String(data.condition_notes || '').trim()) errors.condition_notes = 'Describe the condition and any known faults'
+  if (data.compare_at_price !== '' && data.compare_at_price != null && (!Number.isFinite(Number(data.compare_at_price)) || Number(data.compare_at_price) <= 0)) errors.compare_at_price = 'Comparison price must be greater than zero'
+
   const categoryIds = data.category_ids || (data.category_id ? [data.category_id] : [])
   if (categoryIds.length === 0) {
     errors.category_ids = 'At least one category is required'
@@ -144,13 +148,16 @@ export const validateVariants = (variantTypes, bookableType) => {
   }
 }
 
-export const validateVariantStocks = (variantStocks, bookableType, variantTypes = []) => {
+export const validateVariantStocks = (variantStocks, bookableType, variantTypes = [], hotDeal = false) => {
   const errors = {}
 
   if (!variantStocks || variantStocks.length === 0) {
     errors.variant_stocks = 'At least one stock entry is required'
     return { isValid: false, errors }
   }
+
+  const total = variantStocks.reduce((sum, stock) => sum + (stock.warehouse_stocks || []).reduce((subtotal, item) => subtotal + (Number(item.quantity) || 0), 0), 0)
+  if (hotDeal && total > 1) errors.variant_stocks = 'A Hot Deal can have at most one unit across all warehouses'
 
   variantStocks.forEach((stock, index) => {
     if (bookableType === 'bulk') {
@@ -241,13 +248,22 @@ export const validateStep = (step, formData) => {
       return validateProductInfo(formData)
     case 2:
       return validateProductMeta(formData.product_meta || [])
-    case 3:
-      return validateVariants(formData.variant_types || [], formData.bookable_type)
+    case 3: {
+      const result = validateVariants(formData.variant_types || [], formData.bookable_type)
+      if (formData.hot_deal) {
+        const price = Number(formData.variant_types?.[0]?.options?.[0]?.price)
+        if (!Number.isFinite(price) || price <= 0) result.errors.variant_0_option_0_price = 'Enter a price greater than zero for this Hot Deal'
+        else if (formData.compare_at_price && Number(formData.compare_at_price) <= price) result.errors.variant_0_option_0_price = 'The Hot Deal price must be lower than the comparison price'
+        result.isValid = Object.keys(result.errors).length === 0
+      }
+      return result
+    }
     case 4:
       return validateVariantStocks(
         formData.variant_stocks || [],
         formData.bookable_type,
-        formData.variant_types || []
+        formData.variant_types || [],
+        Boolean(formData.hot_deal)
       )
     case 5:
       return validateImages(formData.images || [], formData.variant_types || [])

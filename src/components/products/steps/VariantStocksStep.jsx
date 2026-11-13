@@ -283,6 +283,8 @@ const VariantStocksStep = ({ formData, errors, onChange }) => {
         </p>
       </div>
 
+      {errors.variant_stocks && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{errors.variant_stocks}</p>}
+      {formData.hot_deal && <p className="text-sm text-gray-600">Set a total of one unit across all warehouses for this individual Hot Deal.</p>}
       {isLoadingWarehouses && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-800">Loading warehouses...</p>
